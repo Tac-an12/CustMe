@@ -4,8 +4,8 @@ use App\Http\Controllers\Api\TaskApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/{path?}', function () {
-    return view('app');
-});
+    return view('app'); // Adjust this to the correct view file
+})->where('path', '.*');
 
 // api/
 // Route::group(['prefix' => 'api'], function() {

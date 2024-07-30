@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { ReactNode } from "react";
 import apiService from "../services/apiService";
 
 interface TaskData {
@@ -10,38 +10,45 @@ interface TaskData {
   updated_at: string;
 }
 
+interface RoleData {
+  roleid: string;
+  rolename: string;
+  // Add more properties if needed
+}
+
 interface TaskContextType {
   taskList: TaskData[];
-  updateContext: () => void;
+  roleList: RoleData[];
+  updateContextData: () => void;
 }
 
 const TaskContext = React.createContext<TaskContextType | undefined>(undefined);
 
-export const TaskProvider: React.FC = ({ children }) => {
+export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [taskList, setTaskList] = React.useState<TaskData[]>([]);
+  const [roleList, setRoleList] = React.useState<RoleData[]>([]);
 
-  const fetchTaskList = () => {
+  const fetchRoleList = () => {
     apiService
-      .get<{ data: TaskData[] }>("get-task-list")
+      .get<{ data: RoleData[] }>("roles")
       .then((response) => {
-        console.log(response);
-        setTaskList(response.data.data);
+        setRoleList(response.data.data);
       })
       .catch((error) => {
-        console.log(error);
+        console.log("Error fetching roles:", error);
       });
   };
 
-  React.useEffect(() => {
-    fetchTaskList();
-  }, []);
-
   const updateContextData = () => {
-    fetchTaskList();
+    fetchRoleList();
   };
 
+  React.useEffect(() => {
+    fetchRoleList();
+  }, []);
+
   return (
-    <TaskContext.Provider value={{ taskList, updateContextData }}>
+    <TaskContext.Provider value={{ taskList, roleList, updateContextData }}>
       {children}
     </TaskContext.Provider>
   );
