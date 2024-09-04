@@ -6,6 +6,8 @@ import Routes from './routes/Routes';
 import { PostProvider } from './context/PostContext';
 import { RequestProvider } from './context/RequestContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { UserProfileProvider } from './context/UserProfileContext';
+import { StoreProvider } from './context/StoreContext';
 
 const App = () => {
     return (
@@ -14,9 +16,13 @@ const App = () => {
                 <PostProvider>
                     <RequestProvider>
                         <NotificationProvider>
-                                <TaskProvider>
-                                    <Routes />
-                                </TaskProvider>
+                            <UserProfileProvider>
+                                    <StoreProvider>
+                                        <TaskProvider>
+                                            <Routes />
+                                        </TaskProvider>
+                                    </StoreProvider>
+                            </UserProfileProvider>
                         </NotificationProvider>
                     </RequestProvider>
                 </PostProvider>

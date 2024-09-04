@@ -38,4 +38,18 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notification::class);
     }
+    public function personalInformation()
+    {
+        return $this->hasOne(PersonalInformation::class, 'user_id');
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id');
+    }
+
+    public function stores()
+    {
+        return $this->hasMany(Store::class);
+    }
 }

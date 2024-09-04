@@ -7,7 +7,7 @@ const NotificationsDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative z-50"> {/* Set a high z-index here */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -15,7 +15,7 @@ const NotificationsDropdown: React.FC = () => {
         <FaBell />
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg">
+        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50"> {/* Apply z-index */}
           <div className="p-4">
             <h2 className="text-lg font-semibold text-black">Notifications</h2>
             <div className="mt-2 max-h-64 overflow-y-auto">

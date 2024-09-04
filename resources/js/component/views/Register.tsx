@@ -3,7 +3,7 @@ import RegisterForm from "./forms/RegisterForm";
 
 const Register = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
       <div className="w-full max-w-screen-md p-6">
         <div className="mb-8">
           <RegisterForm />

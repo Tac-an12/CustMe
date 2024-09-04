@@ -27,7 +27,7 @@ const LoginForm = () => {
           navigate("/printing-shop");
           break;
         default:
-          navigate("/");
+          navigate("/register");
       }
     }
   }, [user, navigate]);
@@ -75,24 +75,36 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-full max-w-md p-6 bg-neutral rounded-lg shadow-lg">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div className="flex justify-center items-center h-screen bg-white">
+      <div className="absolute top-8 right-8">
+        <Link to="/register" className="bg-yellow-500 text-white px-4 py-2 rounded">
+          Sign up
+        </Link>
+      </div>
+      <div className="w-full max-w-md p-8 bg-blue-500 rounded-lg shadow-lg">
+        <h1 className="text-3xl font-bold text-center text-yellow-500 mb-8">
+          <span className="text-blue-600">Cust</span>Me
+        </h1>
+        <h2 className="text-xl font-bold mb-4 text-center text-white">Log in Account to CustMe</h2>
+        <p className="text-center text-white mb-4">Connect with designer and printing provider</p>
+        <div className="flex justify-center space-x-4 mb-4">
+          <button className="bg-white text-blue-500 px-4 py-2 rounded flex items-center space-x-2">
+            <img src="path_to_google_icon" alt="Google" className="w-4 h-4" />
+            <span>Sign up to Google</span>
+          </button>
+          <button className="bg-white text-blue-500 px-4 py-2 rounded flex items-center space-x-2">
+            <img src="path_to_facebook_icon" alt="Facebook" className="w-4 h-4" />
+            <span>Sign up to Facebook</span>
+          </button>
+        </div>
+        <div className="text-center text-white mb-4">OR</div>
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-3">
-            <label className="input input-bordered flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="h-4 w-4 opacity-70"
-              >
-                <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
-                <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
-              </svg>
+          <div className="flex flex-col gap-4">
+            <label className="flex flex-col text-white">
+              Email
               <input
                 type="text"
-                className="grow"
+                className="p-2 rounded bg-white text-black"
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -101,19 +113,11 @@ const LoginForm = () => {
               />
             </label>
             {emailError && <p className="text-xs text-red-500">{emailError}</p>}
-
-            <label className="input input-bordered flex items-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-                className="h-4 w-4 opacity-70"
-              >
-                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
-              </svg>
+            <label className="flex flex-col text-white">
+              Password
               <input
                 type="password"
-                className="grow"
+                className="p-2 rounded bg-white text-black"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -121,20 +125,16 @@ const LoginForm = () => {
                 disabled={isLoading}
               />
             </label>
-            {passwordError && (
-              <p className="text-xs text-red-500">{passwordError}</p>
-            )}
-
-            <Link to="/register" className="link link-warning">
-              Not yet Registered? Register here
+            {passwordError && <p className="text-xs text-red-500">{passwordError}</p>}
+            <Link to="/forgot-password" className="text-xs text-white text-right mb-4">
+              Forgot Password?
             </Link>
-
             <button
               type="submit"
-              className="btn btn-secondary btn-xs sm:btn-sm md:btn-sm lg:btn-md"
+              className="bg-yellow-500 text-white px-4 py-2 rounded"
               disabled={isLoading}
             >
-              {isLoading ? <span className="loading loading-spinner loading-md"></span> : "Login"}
+              {isLoading ? <span className="loading loading-spinner loading-md"></span> : "Log in"}
             </button>
           </div>
         </form>

@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PersonalInformation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -14,12 +15,15 @@ class UserApiController extends Controller
 {
     protected $roleModel;
     protected $userModel;
+    protected $personalInfoModel;
 
     function __construct()
     {
         $this->userModel = new User();
         $this->roleModel = new Role();
+        $this->personalInfoModel = new PersonalInformation();
     }
+
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -45,15 +49,16 @@ class UserApiController extends Controller
 
         return response()->json(['error' => 'Invalid credentials'], 401);
     }
+
     public function currentUser(Request $request)
-{
-    if (Auth::check()) {
-        $user = Auth::user();
-        $user->load('role'); // Eager load the role relationship
-        return response()->json(['user' => $user]);
+    {
+        if (Auth::check()) {
+            $user = Auth::user();
+            $user->load('role', 'personalInformation');
+            return response()->json(['user' => $user]);
+        }
+        return response()->json(['error' => 'Not authenticated'], 401);
     }
-    return response()->json(['error' => 'Not authenticated'], 401);
-}
 
     public function logout(Request $request)
     {
@@ -62,12 +67,12 @@ class UserApiController extends Controller
         return response()->json(['message' => 'Logged out successfully'], 200);
     }
 
- 
-    public function roles() {
-         return response()->json(['data' => $this->roleModel->getRoles()], 200); 
-        }
+    public function roles()
+    {
+        return response()->json(['data' => $this->roleModel->getRoles()], 200);
+    }
 
-    public function register(Request $request)
+        public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:255',
@@ -75,13 +80,18 @@ class UserApiController extends Controller
             'password' => 'required|string|min:8',
             'role_id' => 'required|exists:roles,roleid',
             'verified' => 'boolean',
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'profilepicture' => 'nullable|string',
+            'coverphoto' => 'nullable|string',
+            'zipcode' => 'required|string|max:10',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $this->userModel->createRegister([
+        $user = $this->userModel->create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -89,8 +99,33 @@ class UserApiController extends Controller
             'verified' => $request->has('verified') ? $request->verified : false,
         ]);
 
+        
+        $this->personalInfoModel->create([
+            'user_id' => $user->id, 
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'profilepicture' => $request->profilepicture,
+            'coverphoto' => $request->coverphoto,
+            'zipcode' => $request->zipcode,
+        ]);
+
         return response()->json(['message' => 'User registered successfully'], 201);
     }
+
+    public function getUserProfile($id)
+    {
+        try {
+            $user = User::with('personalInformation')->findOrFail($id);
+            Log::info('User Data:', $user->toArray());
+            return response()->json(['user' => $user], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching user profile:', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
+
+
     public function getUsers(Request $request)
     {
         $currentUser = Auth::user();
@@ -106,11 +141,9 @@ class UserApiController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $status = $request->input('verified', false);   
+        $status = $request->input('verified', false);
         $user->setVerified($status);
 
         return response()->json(['message' => 'User accepted and verified'], 200);
     }
-
-  
 }
