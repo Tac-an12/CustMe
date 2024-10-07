@@ -11,7 +11,7 @@ class Location extends Model
 
     protected $fillable = ['longitude', 'latitude', 'address'];
 
-    
+
 
     // Get all locations
     public function getAllLocations()

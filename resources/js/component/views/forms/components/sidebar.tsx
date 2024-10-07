@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaHome, FaPlus, FaTasks, FaSignOutAlt, FaBars, FaTimes, FaComments, FaShoppingCart, FaPencilRuler } from 'react-icons/fa';
+import { FaHome, FaPlus, FaTasks, FaSignOutAlt, FaComments, FaShoppingCart, FaPencilRuler } from 'react-icons/fa';
 import { useAuth } from '../../../context/AuthContext';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar } from '@mui/material';
 
-const Sidebar = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  toggleSidebar: () => void; // Function passed from parent to open/close the sidebar
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isOpen, setIsOpen] = useState(true);
   const [profilePictureUrl, setProfilePictureUrl] = useState<string>('https://via.placeholder.com/40');
 
   const handleLogout = async () => {
@@ -18,15 +23,10 @@ const Sidebar = () => {
     }
   };
 
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
   const updateProfilePictureUrl = (user: any) => {
     if (user && user.personal_information && user.personal_information.profilepicture) {
       const imageUrl = `http://127.0.0.1:8000/${user.personal_information.profilepicture}?user_id=${user.id}&personal_info_id=${user.personal_information.id}`;
       setProfilePictureUrl(imageUrl);
-      console.log('Profile Picture URL:', imageUrl); 
     } else {
       setProfilePictureUrl('https://via.placeholder.com/40');
     }
@@ -37,17 +37,28 @@ const Sidebar = () => {
   }, [user]);
 
   return (
-    <div className="flex h-screen">
-      <div className={`${isOpen ? 'w-64' : 'w-20'} bg-blue-600 flex flex-col items-center py-4 transition-all duration-300`}>
-        <button onClick={toggleSidebar} className="text-white mb-4">
-          {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-        </button>
+    <Drawer
+      variant="temporary" // Temporary drawer for pop-out
+      anchor="left"
+      open={isOpen}
+      onClose={toggleSidebar} // Close the sidebar when clicking outside
+      sx={{
+        '& .MuiDrawer-paper': {
+          width: 240,
+          boxSizing: 'border-box',
+          backgroundColor: '#1e3a8a',
+          color: 'white',
+        },
+      }}
+    >
+      <List>
+        {/* Profile Picture */}
         {isOpen && (
-          <div className="cursor-pointer mb-4">
-            <img
+          <div className="flex justify-center mt-4 mb-2">
+            <Avatar
               src={profilePictureUrl}
               alt="Profile"
-              className="w-12 h-12 rounded-full mb-4" // Increased size for a bigger circle
+              sx={{ width: 64, height: 64, marginBottom: 2 }}
             />
             {user && (
               <NavLink to={`/users/${user.id}/profile`} className="text-white text-sm hover:underline">
@@ -56,41 +67,59 @@ const Sidebar = () => {
             )}
           </div>
         )}
-        <div className="flex flex-col space-y-4 w-full px-4 mt-4"> {/* Added margin-top to move links down */}
-          <NavLink to="/dashboard" className="bg-blue-500 p-2 rounded text-white flex items-center">
-            <FaHome className="mr-2" />
-            {isOpen && <span>Dashboard</span>}
-          </NavLink>
-          <NavLink to="/chats" className="bg-blue-500 p-2 rounded text-white flex items-center">
-            <FaComments className="mr-2" />
-            {isOpen && <span>Chats</span>}
-          </NavLink>
-          <NavLink to="/purchases" className="bg-blue-500 p-2 rounded text-white flex items-center">
-            <FaShoppingCart className="mr-2" />
-            {isOpen && <span>My Purchases</span>}
-          </NavLink>
-          <NavLink to="/allposts" className="bg-blue-500 p-2 rounded text-white flex items-center">
-            <FaPencilRuler className="mr-2" />
-            {isOpen && <span>Designer</span>}
-          </NavLink>
-          <NavLink to="/users" className="bg-blue-500 p-2 rounded text-white flex items-center">
-            <FaTasks className="mr-2" />
-            {isOpen && <span>Users</span>}
-          </NavLink>
-          <NavLink to="/posts" className="bg-blue-500 p-2 rounded text-white flex items-center">
-            <FaPlus className="mr-2" />
-            {isOpen && <span>Add post</span>}
-          </NavLink>
-          <button className="bg-blue-500 p-2 rounded text-white flex items-center" onClick={handleLogout}>
-            <FaSignOutAlt className="mr-2" />
-            {isOpen && <span>Logout</span>}
-          </button>
-        </div>
-      </div>
-      <div className="flex-1">
-        {/* Your main content goes here */}
-      </div>
-    </div>
+
+        {/* Menu Items */}
+        <ListItem component={NavLink} to="/dashboard">
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaHome />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="Dashboard" />}
+        </ListItem>
+
+        <ListItem component={NavLink} to="/chats">
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaComments />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="Chats" />}
+        </ListItem>
+
+        <ListItem component={NavLink} to="/purchases">
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaShoppingCart />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="My Purchases" />}
+        </ListItem>
+
+        <ListItem component={NavLink} to="/allposts">
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaPencilRuler />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="Designer" />}
+        </ListItem>
+
+        <ListItem component={NavLink} to="/users">
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaTasks />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="Users" />}
+        </ListItem>
+
+        <ListItem component={NavLink} to="/posts">
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaPlus />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="Add post" />}
+        </ListItem>
+
+        {/* Logout Button */}
+        <ListItem onClick={handleLogout} sx={{ cursor: 'pointer' }}>
+          <ListItemIcon sx={{ color: 'white' }}>
+            <FaSignOutAlt />
+          </ListItemIcon>
+          {isOpen && <ListItemText primary="Logout" />}
+        </ListItem>
+      </List>
+    </Drawer>
   );
 };
 

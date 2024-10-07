@@ -51,14 +51,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     const storeWithUserId = { ...store, user_id: user.id };
     try {
-      const response = await apiService.post('/stores', storeWithUserId, { withCredentials: true });
-      setStores((prevStores) => [...prevStores, response.data]);
-      return true;
+        const response = await apiService.post('/stores', storeWithUserId, { withCredentials: true });
+        setStores((prevStores) => [...prevStores, response.data]);
+        return true;
     } catch (error) {
-      console.error('Failed to create store:', error);
-      return false;
+        // Improved error handling
+        if (error.response) {
+            // Server responded with a status other than 200
+            console.error('Failed to create store:', error.response.data);
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('No response received when creating store:', error.request);
+        } else {
+            // Something happened in setting up the request that triggered an error
+            console.error('Error creating store:', error.message);
+        }
+        return false;
     }
-  };
+};
+
 
   const updateStore = async (id: number, store: Store): Promise<boolean> => {
     try {

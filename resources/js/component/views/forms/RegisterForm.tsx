@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import apiServices from "../../services/apiService";
+import { Google, Facebook } from "@mui/icons-material"; // Import MUI icons
 
 const RegisterForm = () => {
   const [email, setEmail] = useState("");
@@ -133,12 +134,12 @@ const RegisterForm = () => {
         <p className="text-center text-white mb-4">Connect with designer and printing provider</p>
         <div className="flex justify-center space-x-4 mb-4">
           <button className="bg-white text-blue-500 px-4 py-2 rounded flex items-center space-x-2">
-            <img src="path_to_google_icon" alt="Google" className="w-4 h-4" />
-            <span>Sign up to Google</span>
+            <Google className="w-4 h-4" />
+            <span>Sign up with Google</span>
           </button>
           <button className="bg-white text-blue-500 px-4 py-2 rounded flex items-center space-x-2">
-            <img src="path_to_facebook_icon" alt="Facebook" className="w-4 h-4" />
-            <span>Sign up to Facebook</span>
+            <Facebook className="w-4 h-4" />
+            <span>Sign up with Facebook</span>
           </button>
         </div>
         <div className="text-center text-white mb-4">OR</div>

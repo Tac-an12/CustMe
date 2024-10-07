@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useStore } from '../../../context/StoreContext';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-
-import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 
 const ShareLocation = () => {
@@ -90,8 +88,7 @@ const ShareLocation = () => {
 
   return (
     <div className="flex h-screen bg-white">
-      <Sidebar />
-
+  
       <div className="flex-1 flex flex-col bg-white">
         <Header />
 

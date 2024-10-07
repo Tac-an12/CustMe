@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Sidebar from '../components/sidebar';
 import Header from '../components/header';
 import { useAuth } from '../../../context/AuthContext';
 import { usePostContext } from '../../../context/PostContext'; // Import usePostContext
@@ -81,7 +80,6 @@ const CreatePostForm: React.FC = () => {
 
   return (
     <div className="flex bg-white min-h-screen">
-      <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header />
         <div className="flex-1 p-8 flex items-center justify-center">

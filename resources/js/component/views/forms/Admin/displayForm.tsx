@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaStar, FaEdit, FaTrash, FaPaperPlane } from 'react-icons/fa';
-import Sidebar from '../components/sidebar';
+import { useNavigate, useParams } from 'react-router-dom';
+import { FaStar, FaEdit, FaTrash, FaPaperPlane, FaComments } from 'react-icons/fa';
 import Header from '../components/header';
+import { Card, CardContent, CardActions, Typography, Button } from '@mui/material';
 import { usePostContext } from '../../../context/PostContext';
 import { useRequest } from '../../../context/RequestContext';
 
@@ -15,6 +15,7 @@ const DisplayForm: React.FC = () => {
   const { posts, fetchPosts, currentPage, totalPages, user, deletePost } = usePostContext();
   const { handleRequest } = useRequest();
   const [page, setPage] = useState(currentPage);
+  const { userId } = useParams();
   const navigate = useNavigate();
 
   const fetchPostsCallback = useCallback(async (page: number, limit: number) => {
@@ -41,28 +42,19 @@ const DisplayForm: React.FC = () => {
     }
   };
 
+  const handleSendMessage = (userId: number) => {
+    navigate(`/chat/${userId}`); // Redirect to chat page with the user's ID
+  };
+
   return (
     <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header />
-        <div className="flex-1 p-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex space-x-4">
-              <button className="px-4 py-2 bg-gray-200 rounded-md">Top Sales</button>
-              <button className="px-4 py-2 bg-gray-200 rounded-md">Latest</button>
-              <div className="relative">
-                <select className="px-4 py-2 bg-gray-200 rounded-md">
-                  <option>Price: High to Low</option>
-                  <option>Price: Low to High</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+        <div className="flex-1 p-8 mt-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1">
             {posts.length > 0 ? (
               posts.map((post) => (
-                <div key={post.post_id} className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                <Card key={post.post_id} className="shadow-lg" style={{ width: '300px', height: 'auto' }}>
                   {post.images.length > 0 ? (
                     <ImageCarousel images={post.images} />
                   ) : (
@@ -70,90 +62,118 @@ const DisplayForm: React.FC = () => {
                       <p className="text-gray-600">No Image Available</p>
                     </div>
                   )}
-                  <div className="p-4 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center mb-2">
-                        <img
-                          src={'https://via.placeholder.com/40'}
-                          alt="Profile"
-                          className="w-8 h-8 rounded-full mr-2"
-                        />
-                        <div>
-                          <p className="text-sm font-semibold">{post.user?.username || 'Unknown'}</p>
-                          <p className="text-xs text-gray-500">{post.user?.role?.rolename || 'N/A'}</p>
-                        </div>
-                      </div>
-                      <h2 className="text-lg font-semibold mb-1">{post.title}</h2>
-                      <p className="text-gray-700 mb-2">{post.content}</p>
-                    </div>
+                  <CardContent>
                     <div className="flex items-center mb-2">
-                      <FaStar className="text-yellow-500 mr-1" />
-                      <span className="text-sm">(1k+)</span>
-                      <span className="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Graphic Design</span>
+                      <img
+                        src={'https://via.placeholder.com/40'}
+                        alt="Profile"
+                        className="w-6 h-6 rounded-full mr-2"
+                      />
+                      <div>
+                        <Typography variant="body2" className="font-semibold">
+                          {post.user?.username || 'Unknown'}
+                        </Typography>
+                        <Typography variant="caption" color="textSecondary">
+                          {post.user?.role?.rolename || 'N/A'}
+                        </Typography>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold">From ₱120</span>
-                      {user && (
-                        <div className="flex items-center">
-                          {post.user_id !== user.id && (
-                            <button
+                    <Typography variant="h6" component="h2" className="font-bold">
+                      {post.title}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" className="mb-2">
+                      {post.content}
+                    </Typography>
+                  </CardContent>
+                  <CardActions className="flex flex-row justify-between items-center">
+                    {user && (
+                      <div className="flex flex-row space-x-2">
+                        {post.user_id !== user.id && (
+                          <>
+                            <Button
                               onClick={() => handleRequest(post.post_id, post.user_id)}
-                              className="text-blue-500 hover:text-blue-600"
+                              variant="outlined"
+                              startIcon={<FaPaperPlane />}
+                              size="small"
+                              color="primary"
                             >
-                              <FaPaperPlane size={20} />
-                            </button>
-                          )}
-                          {post.user_id === user.id && (
-                            <>
-                              <button
-                                onClick={() => handleEdit(post.post_id, post.title, post.content, post.images)}
-                                className="text-green-500 hover:text-green-600"
-                              >
-                                <FaEdit size={20} />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(post.post_id)}
-                                className="text-red-500 hover:text-red-600 ml-2"
-                              >
-                                <FaTrash size={20} />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                              Request
+                            </Button>
+                            <Button
+                              onClick={() => handleSendMessage(post.user_id)}
+                              variant="outlined"
+                              startIcon={<FaComments />}
+                              color="primary"
+                              size="small"
+                            >
+                              Chat
+                            </Button>
+                          </>
+                        )}
+                        {post.user_id === user.id && (
+                          <>
+                            <Button
+                              onClick={() => handleEdit(post.post_id, post.title, post.content, post.images)}
+                              variant="outlined"
+                              startIcon={<FaEdit />}
+                              size="small"
+                              color="success"
+                              className="mt-2"
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              onClick={() => handleDelete(post.post_id)}
+                              variant="outlined"
+                              startIcon={<FaTrash />}
+                              size="small"
+                              color="error"
+                              className="mt-2"
+                            >
+                              Delete
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </CardActions>
+                </Card>
               ))
             ) : (
-              <p>No posts available.</p>
+              <Typography variant="body1" color="textSecondary">
+                No posts available.
+              </Typography>
             )}
           </div>
 
           <div className="flex justify-center mt-8">
-            <button
+            <Button
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md mx-1 hover:bg-blue-600 disabled:bg-gray-300"
+              variant="outlined"
+              className="mx-1"
             >
               Previous
-            </button>
+            </Button>
             {Array.from({ length: totalPages }, (_, index) => (
-              <button
+              <Button
                 key={index + 1}
                 onClick={() => handlePageChange(index + 1)}
-                className={`px-4 py-2 mx-1 rounded-md ${page === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+                variant={page === index + 1 ? 'contained' : 'outlined'}
+                color={page === index + 1 ? 'primary' : 'inherit'}
+                className="mx-1"
               >
                 {index + 1}
-              </button>
+              </Button>
             ))}
-            <button
+            <Button
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
-              className="bg-blue-500 text-white px-4 py-2 rounded-md mx-1 hover:bg-blue-600 disabled:bg-gray-300"
+              variant="outlined"
+              className="mx-1"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       </div>

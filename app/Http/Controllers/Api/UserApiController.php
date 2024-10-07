@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -72,7 +73,7 @@ class UserApiController extends Controller
         return response()->json(['data' => $this->roleModel->getRoles()], 200);
     }
 
-        public function register(Request $request)
+    public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|max:255',
@@ -99,9 +100,9 @@ class UserApiController extends Controller
             'verified' => $request->has('verified') ? $request->verified : false,
         ]);
 
-        
+
         $this->personalInfoModel->create([
-            'user_id' => $user->id, 
+            'user_id' => $user->id,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'profilepicture' => $request->profilepicture,
@@ -115,15 +116,62 @@ class UserApiController extends Controller
     public function getUserProfile($id)
     {
         try {
-            $user = User::with('personalInformation')->findOrFail($id);
+            // Eager load stores with their locations
+            $user = User::with(['personalInformation', 'stores.location'])->findOrFail($id);
+
             Log::info('User Data:', $user->toArray());
+
             return response()->json(['user' => $user], 200);
         } catch (\Exception $e) {
             Log::error('Error fetching user profile:', ['error' => $e->getMessage()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    
+    public function updateUserProfile(Request $request, $id)
+    {
+        Log::info('Incoming request data for updating user profile:', [
+            'id' => $id,
+            'request_data' => $request->all()
+        ]);
+
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'profilepicture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjusted for image validation
+            'coverphoto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            Log::error('Validation errors:', ['errors' => $validator->errors()]);
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::findOrFail($id);
+
+        Log::info('User found, updating profile:', ['user_id' => $user->id]);
+
+        $user->personalInformation()->update([
+            'firstname' => $request->firstname,
+            'lastname' => $request->lastname,
+            'profilepicture' => $user->personalInformation->profilepicture, // Default current value
+            'coverphoto' => $user->personalInformation->coverphoto, // Default current value
+        ]);
+
+        // Handle file uploads
+        if ($request->hasFile('profilepicture')) {
+            $profilePicturePath = $request->file('profilepicture')->store('images', 'public');
+            $user->personalInformation()->update(['profilepicture' => $profilePicturePath]);
+        }
+
+        if ($request->hasFile('coverphoto')) {
+            $coverPhotoPath = $request->file('coverphoto')->store('images', 'public');
+            $user->personalInformation()->update(['coverphoto' => $coverPhotoPath]);
+        }
+
+        Log::info('Profile updated successfully for user:', ['user_id' => $user->id]);
+
+        return response()->json(['message' => 'Profile updated successfully']);
+    }
 
 
     public function getUsers(Request $request)

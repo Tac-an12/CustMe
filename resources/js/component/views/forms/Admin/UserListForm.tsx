@@ -45,7 +45,6 @@ const UserListForm: React.FC = () => {
 
   return (
     <div className="flex bg-white">
-      <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header />
         <div className="flex-1 p-8">

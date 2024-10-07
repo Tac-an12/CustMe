@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import GoogleIcon from '@mui/icons-material/Google'; // Import MUI Google icon
+import FacebookIcon from '@mui/icons-material/Facebook'; // Import MUI Facebook icon
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -89,11 +91,11 @@ const LoginForm = () => {
         <p className="text-center text-white mb-4">Connect with designer and printing provider</p>
         <div className="flex justify-center space-x-4 mb-4">
           <button className="bg-white text-blue-500 px-4 py-2 rounded flex items-center space-x-2">
-            <img src="path_to_google_icon" alt="Google" className="w-4 h-4" />
+            <GoogleIcon className="w-4 h-4" />
             <span>Sign up to Google</span>
           </button>
           <button className="bg-white text-blue-500 px-4 py-2 rounded flex items-center space-x-2">
-            <img src="path_to_facebook_icon" alt="Facebook" className="w-4 h-4" />
+            <FacebookIcon className="w-4 h-4" />
             <span>Sign up to Facebook</span>
           </button>
         </div>
